@@ -16,52 +16,62 @@ def format_number(contacts_list):
     f_contact = re.sub(r"(\+7|8)?[\(\s-]*?(\d{3})?[\)\s-]*(\d{3})[\s-]*(\d{2})[\s-]*(\d{2})", r"+7(\2)\3-\4-\5", f_contact_)
     contacts_as_list = f_contact.split(',')
     contacts_list_.append(contacts_as_list)
-  contacts_list = contacts_list_
+  contacts_list = sorted(contacts_list_)
   return contacts_list
 
 
-def join_duplicates(contacts_list):
+def format_name(contacts_list):
+  list = []
+  for cl in contacts_list:
+    lfs = ("".join(f'{cl[0]} {cl[1]} {cl[2]}').replace("  ", " "))
+    list_name = (lfs.split())
+    if len(list_name) != 3:
+      list_name = (lfs.split(" "))
+    list_name.append(f'{cl[3]}')
+    list_name.append(f'{cl[4]}')
+    list_name.append(f'{cl[5]}')
+    list_name.append(f'{cl[6]}')
+    list.append(list_name)
+  return list
+
+def join_duplicates(list):
   list_csv = []
   x = ''
-  for l in contacts_list:
-    lfs = ("".join(f'{l[0]} {l[1]} {l[2]}').replace("  ", " "))
-    list = (lfs.split())
-    if len(list) != 3:
-      list = (lfs.split(" "))
-    list.append(f'{l[3]}')
-    list.append(f'{l[4]}')
-    list.append(f'{l[5]}')
-    list.append(f'{l[6]}')
-
-    if re.search((lfs).strip(), x) == None:
-      list_csv.append(list)
+  for l in list:
+    lfs = ("".join(f'{l[0]} {l[1]}').replace("  ", " "))
+    if re.search(lfs, x) == None:
+      list_csv.append(l)
     else:
-      if list_csv[-1][3] == '' and list[3] != '':
-        o1 = list[3]
+      if list_csv[-1][2] == '':
+        s1 = l[2]
+      else:
+        s1 = list_csv[-1][2]
+      if list_csv[-1][3] == '':
+        o1 = l[3]
       else:
         o1 = list_csv[-1][3]
-      if list_csv[-1][4] == '' and list[4] != '':
-        p1 = f'{l[4]}'
+      if list_csv[-1][4] == '':
+        p1 = l[4]
       else:
-        p1 = list[4]
-      if list_csv[-1][5] == '' and list[5] != '':
-        ph_1 = list[5]
+        p1 = list_csv[-1][4]
+      if list_csv[-1][5] == '':
+        ph_1 = l[5]
       else:
         ph_1 = list_csv[-1][5]
-      if list_csv[-1][6] == '' and list[6] != '':
-        e1 = list[6]
+      if list_csv[-1][6] == '':
+        e1 = l[6]
       else:
         e1 = list_csv[-1][6]
 
       list1 = []
       list1.append(list_csv[-1][0])
       list1.append(list_csv[-1][1])
-      list1.append(list_csv[-1][2])
+      list1.append(s1)
       list1.append(o1)
       list1.append(p1)
       list1.append(ph_1)
       list1.append(e1)
-      
+
       del (list_csv[-1])
       list_csv.append(list1)
     x = lfs
@@ -76,5 +86,6 @@ def write_file(list_csv):
 if __name__ == '__main__':
     contacts = read_file('phonebook_raw.csv')
     contacts = format_number(contacts)
+    contacts = format_name(contacts)
     contacts = join_duplicates(contacts)
     write_file(contacts)
